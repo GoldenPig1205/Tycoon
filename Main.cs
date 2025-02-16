@@ -26,14 +26,20 @@ namespace Tycoon
 
             Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
 
+            Exiled.Events.Handlers.Player.Verified += OnVerified;
+            Exiled.Events.Handlers.Player.Left += OnLeft;
             Exiled.Events.Handlers.Player.Spawned += OnSpawned;
+            Exiled.Events.Handlers.Player.Died += OnDied;
         }
 
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
 
+            Exiled.Events.Handlers.Player.Verified -= OnVerified;
+            Exiled.Events.Handlers.Player.Left -= OnLeft;
             Exiled.Events.Handlers.Player.Spawned -= OnSpawned;
+            Exiled.Events.Handlers.Player.Died -= OnDied;
 
             Instance = null;
             base.OnDisabled();

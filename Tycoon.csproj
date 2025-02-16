@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -111,6 +112,8 @@
     <Compile Include="Core\Configs\Config.cs" />
     <Compile Include="Core\EventArgs\PlayerEvents.cs" />
     <Compile Include="Core\EventArgs\ServerEvents.cs" />
+    <Compile Include="Core\Extensions\Base.cs" />
+    <Compile Include="Core\Functions\Base.cs" />
     <Compile Include="Core\IEnumerators\Base.cs" />
     <Compile Include="Core\Variables\Base.cs" />
     <Compile Include="Main.cs" />
@@ -118,7 +121,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\Commands\" />
-    <Folder Include="Core\Functions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,7 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static Tycoon.Core.Variables.Base;
+using static Tycoon.Core.Functions.Base;
 using static Tycoon.Core.IEnumerators.Base;
+using static Tycoon.Core.Extensions.Base;
+using MultiBroadcast.API;
+using Exiled.API.Extensions;
+using MapEditorReborn.API.Features.Objects;
 
 namespace Tycoon.Core.EventArgs
 {
@@ -25,8 +30,23 @@ namespace Tycoon.Core.EventArgs
             Server.FriendlyFire = true;
             Server.ExecuteCommand($"/mp load Tycoon");
 
-            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/BGM/"))
-                AudioClipStorage.LoadClip(_audioClip, _audioClip.Replace(Paths.Configs + "/Tycoon/BGM/", "").Replace(".ogg", ""));
+            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/BGMs/"))
+            {
+                string name = _audioClip.Replace(Paths.Configs + "/Tycoon/BGMs/", "").Replace(".ogg", "");
+
+                Audios["BGMs"].Add(name);
+
+                AudioClipStorage.LoadClip(_audioClip, name);
+            }
+
+            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/SEs/"))
+            {
+                string name = _audioClip.Replace(Paths.Configs + "/Tycoon/SEs/", "").Replace(".ogg", "");
+
+                Audios["SEs"].Add(name);
+
+                AudioClipStorage.LoadClip(_audioClip, name);
+            }
 
             GlobalPlayer = AudioPlayer.CreateOrGet($"Global AudioPlayer", onIntialCreation: (p) =>
             {
@@ -34,13 +54,26 @@ namespace Tycoon.Core.EventArgs
             });
 
             FirstSpawnPoint = GameObject.FindObjectsOfType<Transform>().Where(t => t.name == "[SP] First").FirstOrDefault();
-            BaseSpawnPoints = GameObject.FindObjectsOfType<Transform>().Where(t => t.name.StartsWith("[SP] Baseㅣ")).ToList();
+            TycoonSchematic = (SchematicObject)MapEditorReborn.API.API.SpawnedObjects.Where(x => x is SchematicObject).FirstOrDefault();
+
+            foreach (Transform b in TycoonSchematic.transform.GetChild(0).GetChild(3))
+            {
+                Dictionary<Transform, Vector3> dict = new Dictionary<Transform, Vector3> { };
+
+                foreach (Transform child in b)
+                    dict.Add(child, child.position);
+
+                TransformPositions.Add(b, dict);
+
+                ResetBase(int.Parse(b.name));
+            }
 
             InventoryLimits.StandardCategoryLimits[ItemCategory.SpecialWeapon] = 8;
             InventoryLimits.StandardCategoryLimits[ItemCategory.SCPItem] = 8;
             InventoryLimits.Config.RefreshCategoryLimits();
 
             Timing.RunCoroutine(BGM());
+            Timing.RunCoroutine(PlayerStat());
         }
     }
 }
