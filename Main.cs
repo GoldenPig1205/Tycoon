@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Exiled.API.Features;
 using Tycoon.Core.Configs;
 using static Tycoon.Core.EventArgs.ServerEvents;
+using static Tycoon.Core.EventArgs.MapEvents;
 using static Tycoon.Core.EventArgs.PlayerEvents;
 
 namespace Tycoon
@@ -29,7 +30,11 @@ namespace Tycoon
             Exiled.Events.Handlers.Player.Verified += OnVerified;
             Exiled.Events.Handlers.Player.Left += OnLeft;
             Exiled.Events.Handlers.Player.Spawned += OnSpawned;
+            Exiled.Events.Handlers.Player.Hurting += OnHurting;
             Exiled.Events.Handlers.Player.Died += OnDied;
+            Exiled.Events.Handlers.Player.TogglingNoClip += OnTogglingNoClip;
+            Exiled.Events.Handlers.Player.ChangedEmotion += OnChangedEmotion;
+            Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
         }
 
         public override void OnDisabled()
@@ -39,7 +44,11 @@ namespace Tycoon
             Exiled.Events.Handlers.Player.Verified -= OnVerified;
             Exiled.Events.Handlers.Player.Left -= OnLeft;
             Exiled.Events.Handlers.Player.Spawned -= OnSpawned;
+            Exiled.Events.Handlers.Player.Hurting -= OnHurting;
             Exiled.Events.Handlers.Player.Died -= OnDied;
+            Exiled.Events.Handlers.Player.TogglingNoClip -= OnTogglingNoClip;
+            Exiled.Events.Handlers.Player.ChangedEmotion -= OnChangedEmotion;
+            Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
 
             Instance = null;
             base.OnDisabled();

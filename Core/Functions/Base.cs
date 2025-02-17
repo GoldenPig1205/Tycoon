@@ -1,6 +1,11 @@
-﻿using Exiled.API.Features;
+﻿using AdminToys;
+using Exiled.API.Enums;
+using Exiled.API.Features;
 using Hints;
+using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
+using MapEditorReborn.API.Features.Serializable;
+using MEC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +44,9 @@ namespace Tycoon.Core.Functions
             {
                 if (!ignoredItems.Contains(child.name))
                     DisableObject(child);
+
+                else
+                    EnableObject(child);
             }
         }
 
@@ -50,6 +58,170 @@ namespace Tycoon.Core.Functions
         public static void DisableObject(Transform transform)
         {
             transform.position = new Vector3(5000, 5000, 5000);
+        }
+
+        public static IEnumerator<float> DropProduct(int baseNum, Vector3 start)
+        {
+            var primitive = ObjectSpawner.SpawnPrimitive(new PrimitiveSerializable
+            {
+                PrimitiveType = PrimitiveType.Cube,
+                Position = start,
+                Scale = new Vector3(0.5f, 0.5f, 0.5f),
+                PrimitiveFlags = PrimitiveFlags.Visible,
+                Color = "white",
+                RoomType = RoomType.Surface,
+                Rotation = new Vector3(0, 0, 0),
+                Static = false
+            });
+            primitive.name = "1";
+            primitive.Primitive.Base.NetworkMovementSmoothing = 20;
+
+            Transform conveyor;
+
+            Timing.CallDelayed(6, () =>
+            {
+                if (primitive != null)
+                    primitive.Destroy();
+            });
+
+            while (true)
+            {
+                primitive.Position = primitive.Position + Vector3.down * 0.05f;
+
+                if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 0.25f, (LayerMask)1))
+                {
+                    conveyor = hit.transform.parent;
+                    break;
+                }
+
+                yield return Timing.WaitForOneFrame;
+            };
+
+            float startToEndDuration = 5f;
+            float elapsedTime = 0f;
+            Vector3 startingPos = primitive.Position;
+            Vector3 endPosition = conveyor.Find("End").position;
+            Vector3 directionToEnd = (endPosition - primitive.Position).normalized;
+
+            List<string> upgradedList = new List<string> { };
+
+            primitive.Base.Rotation = directionToEnd;
+
+            while (elapsedTime < startToEndDuration)
+            {
+                primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
+                elapsedTime += Timing.DeltaTime;
+
+                if (Physics.Raycast(primitive.Position, directionToEnd, out RaycastHit hit, 0.3f, (LayerMask)1))
+                {
+                    if (hit.transform.name.Contains("Scanner"))
+                    {
+                        if (!upgradedList.Contains(hit.transform.parent.name))
+                        {
+                            upgradedList.Add(hit.transform.parent.name);
+
+                            primitive.name = (int.Parse(primitive.name) + int.Parse(hit.transform.name.Split('/')[1])).ToString();
+                        }
+                    }
+                }
+
+                yield return Timing.WaitForOneFrame;
+            }
+
+            primitive.Destroy();
+            BaseDollars[baseNum] += int.Parse(primitive.name);
+        }
+
+        public static List<T> EnumToList<T>()
+        {
+            Array items = Enum.GetValues(typeof(T));
+            List<T> itemList = new List<T>();
+
+            foreach (T item in items)
+            {
+                if (!item.ToString().Contains("None"))
+                    itemList.Add(item);
+            }
+
+            return itemList;
+        }
+
+        public static bool TryGetLookPlayer(Player player, float Distance, out Player target, out RaycastHit? raycastHit)
+        {
+            target = null;
+            raycastHit = null;
+
+            if (Physics.Raycast(player.ReferenceHub.PlayerCameraReference.position + player.ReferenceHub.PlayerCameraReference.forward * 0.2f, player.ReferenceHub.PlayerCameraReference.forward, out RaycastHit hit, Distance) &&
+                    hit.collider.TryGetComponent<IDestructible>(out IDestructible destructible))
+            {
+                if (Player.TryGet(hit.collider.GetComponentInParent<ReferenceHub>(), out Player t) && player != t)
+                {
+                    target = t;
+                    raycastHit = hit;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static string ColorFormat(string cn)
+        {
+            if (ColorUtility.TryParseHtmlString(cn, out Color color))
+                return color.ToHex();
+
+            else
+            {
+                Dictionary<string, string> Colors = new Dictionary<string, string>
+                {
+                    // {"gold", "#EFC01A"},
+                    // {"teal", "#008080"},
+                    // {"blue", "#005EBC"},
+                    // {"purple", "#8137CE"},
+                    // {"light_red", "#FD8272"},
+                    {"pink", "#FF96DE"},
+                    {"red", "#C50000"},
+                    {"default", "#FFFFFF"},
+                    {"brown", "#944710"},
+                    {"silver", "#A0A0A0"},
+                    {"light_green", "#32CD32"},
+                    {"crimson", "#DC143C"},
+                    {"cyan", "#00B7EB"},
+                    {"aqua", "#00FFFF"},
+                    {"deep_pink", "#FF1493"},
+                    {"tomato", "#FF6448"},
+                    {"yellow", "#FAFF86"},
+                    {"magenta", "#FF0090"},
+                    {"blue_green", "#4DFFB8"},
+                    // {"silver_blue", "#666699"},
+                    {"orange", "#FF9966"},
+                    // {"police_blue", "#002DB3"},
+                    {"lime", "#BFFF00"},
+                    {"green", "#228B22"},
+                    {"emerald", "#50C878"},
+                    {"carmine", "#960018"},
+                    {"nickel", "#727472"},
+                    {"mint", "#98FB98"},
+                    {"army_green", "#4B5320"},
+                    {"pumpkin", "#EE7600"}
+                };
+
+                if (Colors.ContainsKey(cn))
+                    return Colors[cn];
+
+                else
+                    return "#FFFFFF";
+            }
+        }
+
+        public static string BadgeFormat(Player player)
+        {
+            if (player.RankName != null && !player.BadgeHidden)
+                return $"[<color={ColorFormat(player.RankColor)}>{player.RankName}</color>] ";
+
+            else
+                return "";
         }
     }
 }
