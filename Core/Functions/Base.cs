@@ -1,6 +1,7 @@
 ﻿using AdminToys;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Toys;
 using Hints;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
@@ -52,29 +53,43 @@ namespace Tycoon.Core.Functions
 
         public static void EnableObject(Transform transform)
         {
-            transform.position = TransformPositions[transform.parent][transform];
+            if (!EnabledObjects.Contains(transform))
+                EnabledObjects.Add(transform);
+
+            if (Primitives.ContainsKey(transform))
+                Primitives[transform].ForEach(x => { x.Primitive.Spawn(); x.gameObject.SetActive(true); });
+
+            else
+            {
+                List<PrimitiveObject> primitives = transform.GetComponentsInChildren<PrimitiveObject>().ToList();
+
+                primitives.ForEach(x => { x.Primitive.Spawn(); x.gameObject.SetActive(true); });
+
+                Primitives.Add(transform, primitives);
+            }
         }
 
         public static void DisableObject(Transform transform)
         {
-            transform.position = new Vector3(5000, 5000, 5000);
+            if (EnabledObjects.Contains(transform))
+                EnabledObjects.Remove(transform);
+
+            if (Primitives.ContainsKey(transform))
+                Primitives[transform].ForEach(x => { x.Primitive.UnSpawn(); x.gameObject.SetActive(false); });
+
+            else
+            {
+                List<PrimitiveObject> primitives = transform.GetComponentsInChildren<PrimitiveObject>().ToList();
+
+                primitives.ForEach(x => { x.Primitive.UnSpawn(); x.gameObject.SetActive(false); });
+
+                Primitives.Add(transform, primitives);
+            }
         }
 
         public static IEnumerator<float> DropProduct(int baseNum, Vector3 start)
         {
-            var primitive = ObjectSpawner.SpawnPrimitive(new PrimitiveSerializable
-            {
-                PrimitiveType = PrimitiveType.Cube,
-                Position = start,
-                Scale = new Vector3(0.5f, 0.5f, 0.5f),
-                PrimitiveFlags = PrimitiveFlags.Visible,
-                Color = "white",
-                RoomType = RoomType.Surface,
-                Rotation = new Vector3(0, 0, 0),
-                Static = false
-            });
-            primitive.name = "1";
-
+            int power = 1;
             Transform conveyor;
 
             /*
@@ -132,7 +147,7 @@ namespace Tycoon.Core.Functions
             BaseDollars[baseNum] += int.Parse(primitive.name);
             */
 
-            if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
+            if (Physics.Raycast(start, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
             {
                 conveyor = hit.transform.parent;
                 Transform _base = GetBase(baseNum);
@@ -148,14 +163,13 @@ namespace Tycoon.Core.Functions
                 {
                     Transform upgrader = _base.Find(upgraderName);
 
-                    if (upgrader.position.y < 1205)
-                        primitive.name = $"{int.Parse(primitive.name) +  int.Parse(upgrader.GetChild(3).name.Split('/')[1])}";
+                    if (EnabledObjects.Contains(upgrader))
+                        power += int.Parse(upgrader.GetChild(3).name.Split('/')[1]);
                 }
 
                 Timing.CallDelayed(5, () =>
                 {
-                    primitive.Destroy();
-                    BaseDollars[baseNum] += int.Parse(primitive.name);
+                    BaseDollars[baseNum] += power;
                 });
             }
 

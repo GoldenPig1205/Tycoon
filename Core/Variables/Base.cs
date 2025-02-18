@@ -22,8 +22,9 @@ namespace Tycoon.Core.Variables
         public static List<Player> ChatCooldowns = new List<Player>();
         public static List<Player> IntercomPlayers = new List<Player>();
         public static List<Player> GodModePlayers = new List<Player>();
+        public static List<Transform> EnabledObjects = new List<Transform> { };
 
-        public static Dictionary<Transform, Dictionary<Transform, Vector3>> TransformPositions = new Dictionary<Transform, Dictionary<Transform, Vector3>> { };
+        public static Dictionary<Transform, List<PrimitiveObject>> Primitives = new Dictionary<Transform, List<PrimitiveObject>> { };
         public static Dictionary<Player, AudioPlayer> AudioPlayers = new Dictionary<Player, AudioPlayer> { };
         public static Dictionary<string, List<string>> Audios = new Dictionary<string, List<string>> 
         {

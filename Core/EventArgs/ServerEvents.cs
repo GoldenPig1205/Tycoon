@@ -63,8 +63,6 @@ namespace Tycoon.Core.EventArgs
                 foreach (Transform child in b)
                     dict.Add(child, child.position);
 
-                TransformPositions.Add(b, dict);
-
                 ResetBase(int.Parse(b.name));
             }
 

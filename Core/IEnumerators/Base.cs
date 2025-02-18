@@ -197,7 +197,7 @@ namespace Tycoon.Core.IEnumerators
                         {
                             Transform up = dropper.GetChild(0);
 
-                            if (dropper.position.y < 1205)
+                            if (EnabledObjects.Contains(dropper))
                             {
                                 int Power = int.Parse(up.name.Split('/')[1]);
 
