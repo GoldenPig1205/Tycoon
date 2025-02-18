@@ -109,12 +109,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Classes\RemoteCommandSender.cs" />
     <Compile Include="Core\Commands\ClientCommands\basicfeatures\Chat.cs" />
     <Compile Include="Core\Commands\ClientCommands\basicfeatures\Emotion.cs" />
     <Compile Include="Core\Commands\ClientCommands\basicfeatures\Suicide.cs" />
     <Compile Include="Core\Commands\RemoteAdminCommands\AdminFeatures\ManageDollar.cs" />
     <Compile Include="Core\Configs\Config.cs" />
     <Compile Include="Core\EventArgs\MapEvents.cs" />
+    <Compile Include="Core\EventArgs\MEREvents.cs" />
     <Compile Include="Core\EventArgs\PlayerEvents.cs" />
     <Compile Include="Core\EventArgs\ServerEvents.cs" />
     <Compile Include="Core\Extensions\Base.cs" />

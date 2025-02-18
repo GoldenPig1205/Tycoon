@@ -13,6 +13,8 @@ using InventorySystem.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Items;
 using PluginAPI.Events;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles;
 
 namespace Tycoon.Core.IEnumerators
 {
@@ -203,7 +205,7 @@ namespace Tycoon.Core.IEnumerators
                                 {
                                     for (int i = 0; i < Power; i++)
                                     {
-                                        DropProduct(num, up.position);
+                                        Timing.RunCoroutine(DropProduct(num, up.position));
 
                                         yield return Timing.WaitForSeconds(0.5f);
                                     }
@@ -256,7 +258,7 @@ namespace Tycoon.Core.IEnumerators
                     Server.ExecuteCommand($"/cleanup {s}");
                 }
 
-                yield return Timing.WaitForSeconds(60);
+                yield return Timing.WaitForSeconds(300);
             }
         }
 
@@ -299,6 +301,34 @@ namespace Tycoon.Core.IEnumerators
                 }
 
                 yield return Timing.WaitForSeconds(1);
+            }
+        }
+
+        public static IEnumerator<float> IsFallDown()
+        {
+            while (true)
+            {
+                foreach (var player in Player.List.Where(x => x.IsAlive))
+                {
+                    if (OnGround.ContainsKey(player) && !player.IsNoclipPermitted && player.Role.Type != RoleTypeId.Scp079)
+                    {
+                        if (FpcExtensionMethods.IsGrounded(player.ReferenceHub))
+                            OnGround[player] = 5;
+                        else
+                        {
+                            OnGround[player] -= 0.1f;
+
+                            if (OnGround[player] <= 0)
+                            {
+                                player.Kill("공허에 빨려들어갔습니다. (5초 이상 낙하)");
+
+                                OnGround[player] = 5;
+                            }
+                        }
+                    }
+                }
+
+                yield return Timing.WaitForSeconds(0.1f);
             }
         }
     }

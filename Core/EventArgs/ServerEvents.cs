@@ -82,10 +82,11 @@ namespace Tycoon.Core.EventArgs
             Timing.RunCoroutine(BGM());
             Timing.RunCoroutine(PlayerStat());
             Timing.RunCoroutine(AutoDropper());
-            Timing.RunCoroutine(OwnerDoor());
+            // Timing.RunCoroutine(OwnerDoor());
             Timing.RunCoroutine(ClearDecals());
             Timing.RunCoroutine(InputCooldown());
             Timing.RunCoroutine(ItemSpawner());
+            Timing.RunCoroutine(IsFallDown());
         }
     }
 }

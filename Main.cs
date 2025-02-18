@@ -8,6 +8,7 @@ using Tycoon.Core.Configs;
 using static Tycoon.Core.EventArgs.ServerEvents;
 using static Tycoon.Core.EventArgs.MapEvents;
 using static Tycoon.Core.EventArgs.PlayerEvents;
+using static Tycoon.Core.EventArgs.MEREvents;
 
 namespace Tycoon
 {
@@ -35,6 +36,8 @@ namespace Tycoon
             Exiled.Events.Handlers.Player.TogglingNoClip += OnTogglingNoClip;
             Exiled.Events.Handlers.Player.ChangedEmotion += OnChangedEmotion;
             Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
+
+            MapEditorReborn.Events.Handlers.MapEditorObject.DeletingObject += OnDeletingObject;
         }
 
         public override void OnDisabled()
@@ -49,6 +52,8 @@ namespace Tycoon
             Exiled.Events.Handlers.Player.TogglingNoClip -= OnTogglingNoClip;
             Exiled.Events.Handlers.Player.ChangedEmotion -= OnChangedEmotion;
             Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
+
+            MapEditorReborn.Events.Handlers.MapEditorObject.DeletingObject -= OnDeletingObject;
 
             Instance = null;
             base.OnDisabled();

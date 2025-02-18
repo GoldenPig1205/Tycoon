@@ -35,5 +35,6 @@ namespace Tycoon.Core.Variables
         public static Dictionary<int, int> BaseDollars = new Dictionary<int, int> { }; // 베이스 ID, 달러
         public static Dictionary<int, bool> BaseRasers = new Dictionary<int, bool> { }; // 베이스 ID, 여부
         public static Dictionary<int, Transform> RaserDoors = new Dictionary<int, Transform>();
+        public static Dictionary<Player, float> OnGround = new Dictionary<Player, float>();
     }
 }

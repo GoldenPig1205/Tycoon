@@ -60,7 +60,7 @@ namespace Tycoon.Core.Functions
             transform.position = new Vector3(5000, 5000, 5000);
         }
 
-        public static void DropProduct(int baseNum, Vector3 start)
+        public static IEnumerator<float> DropProduct(int baseNum, Vector3 start)
         {
             var primitive = ObjectSpawner.SpawnPrimitive(new PrimitiveSerializable
             {
@@ -74,58 +74,63 @@ namespace Tycoon.Core.Functions
                 Static = false
             });
             primitive.name = "1";
-            primitive.Primitive.Base.NetworkMovementSmoothing = 20;
 
-            //Timing.CallDelayed(10, () =>
-            //{
-            //    if (primitive != null)
-            //        primitive.Destroy();
-            //});
+            Transform conveyor;
 
-            //while (true)
-            //{
-            //    primitive.Position = primitive.Position + Vector3.down * 0.05f;
+            Timing.CallDelayed(10, () =>
+            {
+                if (primitive != null)
+                    primitive.Destroy();
+            });
 
-            //    if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 0.25f, (LayerMask)1))
-            //    {
-            //        conveyor = hit.transform.parent;
-            //        break;
-            //    }
+            while (true)
+            {
+                primitive.Position = primitive.Position + Vector3.down * 0.05f;
 
-            //    yield return Timing.WaitForOneFrame;
-            //};
+                if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 0.25f, (LayerMask)1))
+                {
+                    conveyor = hit.transform.parent;
+                    break;
+                }
 
-            //float startToEndDuration = 5f;
-            //float elapsedTime = 0f;
-            //Vector3 startingPos = primitive.Position;
-            //Vector3 endPosition = conveyor.Find("End").position;
-            //Vector3 directionToEnd = (endPosition - primitive.Position).normalized;
+                yield return Timing.WaitForOneFrame;
+            };
 
-            //List<string> upgradedList = new List<string> { };
+            float startToEndDuration = 5f;
+            float elapsedTime = 0f;
+            Vector3 startingPos = primitive.Position;
+            Vector3 endPosition = conveyor.Find("End").position;
+            Vector3 directionToEnd = (endPosition - primitive.Position).normalized;
 
-            //primitive.Base.Rotation = directionToEnd;
+            List<string> upgradedList = new List<string> { };
 
-            //while (elapsedTime < startToEndDuration)
-            //{
-            //    primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
-            //    elapsedTime += 1;
+            primitive.Base.Rotation = directionToEnd;
 
-            //    if (Physics.Raycast(primitive.Position, directionToEnd, out RaycastHit hit, 0.3f, (LayerMask)1))
-            //    {
-            //        if (hit.transform.name.Contains("Scanner"))
-            //        {
-            //            if (!upgradedList.Contains(hit.transform.parent.name))
-            //            {
-            //                upgradedList.Add(hit.transform.parent.name);
+            while (elapsedTime < startToEndDuration)
+            {
+                primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
+                elapsedTime += 1;
 
-            //                primitive.name = (int.Parse(primitive.name) + int.Parse(hit.transform.name.Split('/')[1])).ToString();
-            //            }
-            //        }
-            //    }
+                if (Physics.Raycast(primitive.Position, directionToEnd, out RaycastHit hit, 0.3f, (LayerMask)1))
+                {
+                    if (hit.transform.name.Contains("Scanner"))
+                    {
+                        if (!upgradedList.Contains(hit.transform.parent.name))
+                        {
+                            upgradedList.Add(hit.transform.parent.name);
 
-            //    yield return Timing.WaitForSeconds(1);
-            //}
+                            primitive.name = (int.Parse(primitive.name) + int.Parse(hit.transform.name.Split('/')[1])).ToString();
+                        }
+                    }
+                }
 
+                yield return Timing.WaitForSeconds(1);
+            }
+
+            primitive.Destroy();
+            BaseDollars[baseNum] += int.Parse(primitive.name);
+
+            /*
             if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
             {
                 Transform conveyor = hit.transform.parent;
@@ -152,6 +157,7 @@ namespace Tycoon.Core.Functions
                     BaseDollars[baseNum] += int.Parse(primitive.name);
                 });
             }
+            */
         }
 
         public static List<T> EnumToList<T>()

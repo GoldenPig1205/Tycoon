@@ -17,6 +17,14 @@ using MultiBroadcast.API;
 using PlayerRoles.FirstPersonControl.Thirdperson.Subcontrollers;
 using Exiled.API.Features.DamageHandlers;
 using Exiled.API.Features.Pickups;
+using Exiled.API.Features.Toys;
+using InventorySystem.Items.Firearms.Attachments;
+using MapEditorReborn.API.Enums;
+using MapEditorReborn.API;
+using Exiled.API.Features.Items;
+using RemoteAdmin;
+using static System.Net.Mime.MediaTypeNames;
+using Tycoon.Core.Classes;
 
 namespace Tycoon.Core.EventArgs
 {
@@ -172,7 +180,7 @@ namespace Tycoon.Core.EventArgs
                                 DropperCooldowns.Remove(ev.Player);
                             });
 
-                            DropProduct(int.Parse(hit.transform.parent.parent.name), hit.transform.parent.GetChild(0).position);
+                            Timing.RunCoroutine(DropProduct(int.Parse(hit.transform.parent.parent.name), hit.transform.parent.GetChild(0).position));
                         }
                     }
                     else if (option == "Raser Toggle")
@@ -192,10 +200,15 @@ namespace Tycoon.Core.EventArgs
                                 if (raser.name == "Raser")
                                 {
                                     if (!BaseRasers[baseID])
+                                    {
                                         raser.GetComponent<PrimitiveObject>().Primitive.Color = new Color(0, 1, 0, 0.5f);
-
+                                        raser.GetComponent<PrimitiveObject>().Primitive.Collidable = false;
+                                    }
                                     else
+                                    {
                                         raser.GetComponent<PrimitiveObject>().Primitive.Color = new Color(1, 0, 0, 0.5f);
+                                        raser.GetComponent<PrimitiveObject>().Primitive.Collidable = true;
+                                    }
                                 }
                             }
                         }
@@ -223,7 +236,13 @@ namespace Tycoon.Core.EventArgs
 
                                 AudioPlayers[ev.Player].AddClip("Cash Sound", volume: 2);
 
-                                ev.Player.AddItem((ItemType)Random.Range(0, 56));
+                                if (Random.Range(1, 51) == 1)
+                                {
+                                    RemoteCommandSender sender2 = new RemoteCommandSender(ev.Player.ReferenceHub, ulong.MaxValue, byte.MaxValue, true);
+                                    CommandProcessor.ProcessQuery("/mp tg", sender2);
+                                }
+                                else
+                                    ev.Player.AddItem((ItemType)Random.Range(0, 56));
                             }
                             else
                             {
