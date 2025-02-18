@@ -68,6 +68,13 @@ namespace Tycoon.Core.EventArgs
                 ResetBase(int.Parse(b.name));
             }
 
+            for (int i = 1; i < 10; i++)
+            {
+                Transform ownerDoor = GetBase(i).Find("Owner Door");
+
+                RaserDoors.Add(i, ownerDoor);
+            }
+
             InventoryLimits.StandardCategoryLimits[ItemCategory.SpecialWeapon] = 8;
             InventoryLimits.StandardCategoryLimits[ItemCategory.SCPItem] = 8;
             InventoryLimits.Config.RefreshCategoryLimits();

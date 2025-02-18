@@ -125,9 +125,9 @@ namespace Tycoon.Core.EventArgs
             {
                 if (PlayerBases.ContainsKey(ev.Attacker) && PlayerBases.ContainsKey(ev.Player))
                 {
-                    AudioPlayers[ev.Player].AddClip("Coin");
+                    AudioPlayers[ev.Attacker].AddClip("Coin");
 
-                    PlayerDollars[ev.Player] += Random.Range(1, Random.Range(10, Random.Range(30, 100)));
+                    PlayerDollars[ev.Attacker] += Random.Range(1, Random.Range(10, Random.Range(30, 100)));
                 }
             }
 
@@ -172,7 +172,7 @@ namespace Tycoon.Core.EventArgs
                                 DropperCooldowns.Remove(ev.Player);
                             });
 
-                            Timing.RunCoroutine(DropProduct(int.Parse(hit.transform.parent.parent.name), hit.transform.parent.GetChild(0).position));
+                            DropProduct(int.Parse(hit.transform.parent.parent.name), hit.transform.parent.GetChild(0).position);
                         }
                     }
                     else if (option == "Raser Toggle")

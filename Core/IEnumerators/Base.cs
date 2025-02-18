@@ -12,6 +12,7 @@ using static Tycoon.Core.Functions.Base;
 using InventorySystem.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Items;
+using PluginAPI.Events;
 
 namespace Tycoon.Core.IEnumerators
 {
@@ -66,7 +67,7 @@ namespace Tycoon.Core.IEnumerators
                                         {
                                             AudioPlayers[player].AddClip("wrong");
 
-                                            return $"<color=red>💲</color>{cost}이(가) 부족합니다.";
+                                            return $"<color=red>💲</color>{cost - PlayerDollars[player]}이(가) 부족합니다.";
                                         }
                                     }
                                     else if (hit.transform.name == "Receive Dollar")
@@ -202,7 +203,7 @@ namespace Tycoon.Core.IEnumerators
                                 {
                                     for (int i = 0; i < Power; i++)
                                     {
-                                        Timing.RunCoroutine(DropProduct(num, up.position));
+                                        DropProduct(num, up.position);
 
                                         yield return Timing.WaitForSeconds(0.5f);
                                     }
@@ -222,13 +223,11 @@ namespace Tycoon.Core.IEnumerators
         {
             while (true)
             {
-                foreach (var num in PlayerBases.Values)
+                foreach (var ownerDoor in RaserDoors)
                 {
-                    Transform ownerDoor = GetBase(num).Find("Owner Door");
-
                     foreach (var player in Player.List.Where(PlayerBases.ContainsKey))
                     {
-                        if (Vector3.Distance(player.Position, ownerDoor.position) < 1 && PlayerBases[player] != num && BaseRasers[num])
+                        if (Vector3.Distance(player.Position, ownerDoor.Value.position) < 1 && PlayerBases[player] != ownerDoor.Key && BaseRasers[ownerDoor.Key])
                             player.Kill("보안문 레이저에 의해 구워졌습니다.");
                     }
                 }

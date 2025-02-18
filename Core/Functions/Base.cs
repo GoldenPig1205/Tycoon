@@ -60,7 +60,7 @@ namespace Tycoon.Core.Functions
             transform.position = new Vector3(5000, 5000, 5000);
         }
 
-        public static IEnumerator<float> DropProduct(int baseNum, Vector3 start)
+        public static void DropProduct(int baseNum, Vector3 start)
         {
             var primitive = ObjectSpawner.SpawnPrimitive(new PrimitiveSerializable
             {
@@ -76,60 +76,82 @@ namespace Tycoon.Core.Functions
             primitive.name = "1";
             primitive.Primitive.Base.NetworkMovementSmoothing = 20;
 
-            Transform conveyor;
+            //Timing.CallDelayed(10, () =>
+            //{
+            //    if (primitive != null)
+            //        primitive.Destroy();
+            //});
 
-            Timing.CallDelayed(6, () =>
+            //while (true)
+            //{
+            //    primitive.Position = primitive.Position + Vector3.down * 0.05f;
+
+            //    if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 0.25f, (LayerMask)1))
+            //    {
+            //        conveyor = hit.transform.parent;
+            //        break;
+            //    }
+
+            //    yield return Timing.WaitForOneFrame;
+            //};
+
+            //float startToEndDuration = 5f;
+            //float elapsedTime = 0f;
+            //Vector3 startingPos = primitive.Position;
+            //Vector3 endPosition = conveyor.Find("End").position;
+            //Vector3 directionToEnd = (endPosition - primitive.Position).normalized;
+
+            //List<string> upgradedList = new List<string> { };
+
+            //primitive.Base.Rotation = directionToEnd;
+
+            //while (elapsedTime < startToEndDuration)
+            //{
+            //    primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
+            //    elapsedTime += 1;
+
+            //    if (Physics.Raycast(primitive.Position, directionToEnd, out RaycastHit hit, 0.3f, (LayerMask)1))
+            //    {
+            //        if (hit.transform.name.Contains("Scanner"))
+            //        {
+            //            if (!upgradedList.Contains(hit.transform.parent.name))
+            //            {
+            //                upgradedList.Add(hit.transform.parent.name);
+
+            //                primitive.name = (int.Parse(primitive.name) + int.Parse(hit.transform.name.Split('/')[1])).ToString();
+            //            }
+            //        }
+            //    }
+
+            //    yield return Timing.WaitForSeconds(1);
+            //}
+
+            if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
             {
-                if (primitive != null)
+                Transform conveyor = hit.transform.parent;
+                Transform _base = GetBase(baseNum);
+
+                Dictionary<string, string[]> upgraders = new Dictionary<string, string[]>
+                {
+                    { "Conveyor 1", new string[] { "Upgrader 1", "Upgrader 2", "Super Upgrader 1" } },
+                    { "Conveyor 2", new string[] { "Upgrader 3", "Super Upgrader 2", "Ultra Upgrader 1" } },
+                    { "Conveyor 3", new string[] { "Ultra Upgrader 2", "Hyper Upgrader 1", "Mega Upgrader 1" } }
+                };
+
+                foreach (string upgraderName in upgraders[conveyor.name])
+                {
+                    Transform upgrader = _base.Find(upgraderName);
+
+                    if (upgrader.position.y < 1205)
+                        primitive.name = $"{int.Parse(primitive.name) +  int.Parse(upgrader.GetChild(3).name.Split('/')[1])}";
+                }
+
+                Timing.CallDelayed(5, () =>
+                {
                     primitive.Destroy();
-            });
-
-            while (true)
-            {
-                primitive.Position = primitive.Position + Vector3.down * 0.05f;
-
-                if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 0.25f, (LayerMask)1))
-                {
-                    conveyor = hit.transform.parent;
-                    break;
-                }
-
-                yield return Timing.WaitForOneFrame;
-            };
-
-            float startToEndDuration = 5f;
-            float elapsedTime = 0f;
-            Vector3 startingPos = primitive.Position;
-            Vector3 endPosition = conveyor.Find("End").position;
-            Vector3 directionToEnd = (endPosition - primitive.Position).normalized;
-
-            List<string> upgradedList = new List<string> { };
-
-            primitive.Base.Rotation = directionToEnd;
-
-            while (elapsedTime < startToEndDuration)
-            {
-                primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
-                elapsedTime += Timing.DeltaTime;
-
-                if (Physics.Raycast(primitive.Position, directionToEnd, out RaycastHit hit, 0.3f, (LayerMask)1))
-                {
-                    if (hit.transform.name.Contains("Scanner"))
-                    {
-                        if (!upgradedList.Contains(hit.transform.parent.name))
-                        {
-                            upgradedList.Add(hit.transform.parent.name);
-
-                            primitive.name = (int.Parse(primitive.name) + int.Parse(hit.transform.name.Split('/')[1])).ToString();
-                        }
-                    }
-                }
-
-                yield return Timing.WaitForOneFrame;
+                    BaseDollars[baseNum] += int.Parse(primitive.name);
+                });
             }
-
-            primitive.Destroy();
-            BaseDollars[baseNum] += int.Parse(primitive.name);
         }
 
         public static List<T> EnumToList<T>()
