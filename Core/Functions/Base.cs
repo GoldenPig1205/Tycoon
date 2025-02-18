@@ -77,6 +77,7 @@ namespace Tycoon.Core.Functions
 
             Transform conveyor;
 
+            /*
             Timing.CallDelayed(10, () =>
             {
                 if (primitive != null)
@@ -129,11 +130,11 @@ namespace Tycoon.Core.Functions
 
             primitive.Destroy();
             BaseDollars[baseNum] += int.Parse(primitive.name);
+            */
 
-            /*
             if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
             {
-                Transform conveyor = hit.transform.parent;
+                conveyor = hit.transform.parent;
                 Transform _base = GetBase(baseNum);
 
                 Dictionary<string, string[]> upgraders = new Dictionary<string, string[]>
@@ -157,7 +158,8 @@ namespace Tycoon.Core.Functions
                     BaseDollars[baseNum] += int.Parse(primitive.name);
                 });
             }
-            */
+
+            yield break;
         }
 
         public static List<T> EnumToList<T>()
