@@ -207,7 +207,7 @@ namespace Tycoon.Core.IEnumerators
                                     {
                                         Timing.RunCoroutine(DropProduct(num, up.position));
 
-                                        yield return Timing.WaitForSeconds(0.5f);
+                                        yield return Timing.WaitForSeconds(0.39f);
                                     }
                                 }
 

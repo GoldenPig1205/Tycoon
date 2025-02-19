@@ -92,7 +92,19 @@ namespace Tycoon.Core.Functions
             int power = 1;
             Transform conveyor;
 
-            /*
+            var primitive = ObjectSpawner.SpawnPrimitive(new PrimitiveSerializable
+            {
+                PrimitiveType = PrimitiveType.Cube,
+                Position = start,
+                Scale = new Vector3(0.5f, 0.5f, 0.5f),
+                PrimitiveFlags = PrimitiveFlags.Visible,
+                Color = "white",
+                RoomType = RoomType.Surface,
+                Rotation = new Vector3(0, 0, 0),
+                Static = false
+            });
+            primitive.name = "1";
+
             Timing.CallDelayed(10, () =>
             {
                 if (primitive != null)
@@ -103,9 +115,9 @@ namespace Tycoon.Core.Functions
             {
                 primitive.Position = primitive.Position + Vector3.down * 0.05f;
 
-                if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit, 0.25f, (LayerMask)1))
+                if (Physics.Raycast(primitive.Position, Vector3.down, out RaycastHit hit1, 0.25f, (LayerMask)1))
                 {
-                    conveyor = hit.transform.parent;
+                    conveyor = hit1.transform.parent;
                     break;
                 }
 
@@ -116,36 +128,8 @@ namespace Tycoon.Core.Functions
             float elapsedTime = 0f;
             Vector3 startingPos = primitive.Position;
             Vector3 endPosition = conveyor.Find("End").position;
-            Vector3 directionToEnd = (endPosition - primitive.Position).normalized;
 
             List<string> upgradedList = new List<string> { };
-
-            primitive.Base.Rotation = directionToEnd;
-
-            while (elapsedTime < startToEndDuration)
-            {
-                primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
-                elapsedTime += 1;
-
-                if (Physics.Raycast(primitive.Position, directionToEnd, out RaycastHit hit, 0.3f, (LayerMask)1))
-                {
-                    if (hit.transform.name.Contains("Scanner"))
-                    {
-                        if (!upgradedList.Contains(hit.transform.parent.name))
-                        {
-                            upgradedList.Add(hit.transform.parent.name);
-
-                            primitive.name = (int.Parse(primitive.name) + int.Parse(hit.transform.name.Split('/')[1])).ToString();
-                        }
-                    }
-                }
-
-                yield return Timing.WaitForSeconds(1);
-            }
-
-            primitive.Destroy();
-            BaseDollars[baseNum] += int.Parse(primitive.name);
-            */
 
             if (Physics.Raycast(start, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
             {
@@ -166,12 +150,18 @@ namespace Tycoon.Core.Functions
                     if (EnabledObjects.Contains(upgrader))
                         power += int.Parse(upgrader.GetChild(3).name.Split('/')[1]);
                 }
-
-                Timing.CallDelayed(5, () =>
-                {
-                    BaseDollars[baseNum] += power;
-                });
             }
+
+            while (elapsedTime < startToEndDuration)
+            {
+                primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
+                elapsedTime += 1;
+
+                yield return Timing.WaitForSeconds(1);
+            }
+
+            primitive.Destroy();
+            BaseDollars[baseNum] += power;
 
             yield break;
         }

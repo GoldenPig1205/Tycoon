@@ -202,12 +202,12 @@ namespace Tycoon.Core.EventArgs
                                     if (!BaseRasers[baseID])
                                     {
                                         raser.GetComponent<PrimitiveObject>().Primitive.Color = new Color(0, 1, 0, 0.5f);
-                                        raser.GetComponent<PrimitiveObject>().Primitive.Collidable = false;
+                                        // raser.GetComponent<PrimitiveObject>().Primitive.Collidable = false;
                                     }
                                     else
                                     {
                                         raser.GetComponent<PrimitiveObject>().Primitive.Color = new Color(1, 0, 0, 0.5f);
-                                        raser.GetComponent<PrimitiveObject>().Primitive.Collidable = true;
+                                        // raser.GetComponent<PrimitiveObject>().Primitive.Collidable = true;
                                     }
                                 }
                             }
@@ -236,13 +236,7 @@ namespace Tycoon.Core.EventArgs
 
                                 AudioPlayers[ev.Player].AddClip("Cash Sound", volume: 2);
 
-                                if (Random.Range(1, 51) == 1)
-                                {
-                                    RemoteCommandSender sender2 = new RemoteCommandSender(ev.Player.ReferenceHub, ulong.MaxValue, byte.MaxValue, true);
-                                    CommandProcessor.ProcessQuery("/mp tg", sender2);
-                                }
-                                else
-                                    ev.Player.AddItem((ItemType)Random.Range(0, 56));
+                                ev.Player.AddItem((ItemType)Random.Range(0, 56));
                             }
                             else
                             {
