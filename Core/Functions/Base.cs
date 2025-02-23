@@ -92,6 +92,7 @@ namespace Tycoon.Core.Functions
             int power = 1;
             Transform conveyor;
 
+            /*
             var primitive = ObjectSpawner.SpawnPrimitive(new PrimitiveSerializable
             {
                 PrimitiveType = PrimitiveType.Cube,
@@ -130,6 +131,7 @@ namespace Tycoon.Core.Functions
             Vector3 endPosition = conveyor.Find("End").position;
 
             List<string> upgradedList = new List<string> { };
+            */
 
             if (Physics.Raycast(start, Vector3.down, out RaycastHit hit, 10, (LayerMask)1))
             {
@@ -152,6 +154,7 @@ namespace Tycoon.Core.Functions
                 }
             }
 
+            /*
             while (elapsedTime < startToEndDuration)
             {
                 primitive.Position = Vector3.Lerp(startingPos, endPosition, elapsedTime / startToEndDuration);
@@ -161,6 +164,8 @@ namespace Tycoon.Core.Functions
             }
 
             primitive.Destroy();
+            */
+
             BaseDollars[baseNum] += power;
 
             yield break;

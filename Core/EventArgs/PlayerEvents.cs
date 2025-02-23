@@ -219,7 +219,7 @@ namespace Tycoon.Core.EventArgs
                     int itemID = int.Parse(hit.transform.name.Split('/')[1]);
                     ItemType itemType = (ItemType)itemID;
 
-                    if (!ItemCooldowns.Contains(ev.Player))
+                    if (!ItemCooldowns.Contains(ev.Player) && !ev.Player.IsInventoryFull)
                     {
                         ItemCooldowns.Add(ev.Player);
 

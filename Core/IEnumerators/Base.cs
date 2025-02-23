@@ -229,7 +229,7 @@ namespace Tycoon.Core.IEnumerators
                 {
                     foreach (var player in Player.List.Where(PlayerBases.ContainsKey))
                     {
-                        if (Vector3.Distance(player.Position, ownerDoor.Value.position) < 1 && PlayerBases[player] != ownerDoor.Key && BaseRasers[ownerDoor.Key])
+                        if (Vector3.Distance(player.Position, ownerDoor.Value.position) < 1 && PlayerBases[player] != ownerDoor.Key && BaseRasers[ownerDoor.Key] && EnabledObjects.Contains(ownerDoor.Value))
                             player.Kill("보안문 레이저에 의해 구워졌습니다.");
                     }
                 }
