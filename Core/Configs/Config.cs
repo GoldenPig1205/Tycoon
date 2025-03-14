@@ -11,5 +11,8 @@ namespace Tycoon.Core.Configs
     {
         public bool IsEnabled { get; set; } = true;
         public bool Debug { get; set; } = false;
+        public bool AutoStart { get; set; } = false;
+        public float radius { get; set; } = 100;
+        public int baseCount { get; set; } = 35;
     }
 }

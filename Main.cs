@@ -8,6 +8,7 @@ using Tycoon.Core.Configs;
 using static Tycoon.Core.EventArgs.ServerEvents;
 using static Tycoon.Core.EventArgs.MapEvents;
 using static Tycoon.Core.EventArgs.PlayerEvents;
+using static Tycoon.Core.Variables.Base;
 
 namespace Tycoon
 {
@@ -24,6 +25,8 @@ namespace Tycoon
         {
             base.OnEnabled();
             Instance = this;
+
+            AutoStart = Config.AutoStart;
 
             Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
 

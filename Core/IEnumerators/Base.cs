@@ -15,6 +15,7 @@ using Exiled.API.Features.Items;
 using PluginAPI.Events;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles;
+using Exiled.API.Enums;
 
 namespace Tycoon.Core.IEnumerators
 {
@@ -47,7 +48,11 @@ namespace Tycoon.Core.IEnumerators
                             {
                                 if (Physics.Raycast(player.Position, Vector3.down, out hit, 1, (LayerMask)1))
                                 {
-                                    if (hit.transform.name.StartsWith("Interaction") && IsBase(hit, player, out int num))
+                                    if (hit.transform.name.StartsWith("Booster Zone"))
+                                    {
+                                        player.EnableEffect(EffectType.MovementBoost, 255, 1);
+                                    } 
+                                    else if (hit.transform.name.StartsWith("Interaction") && IsBase(hit, player, out int num))
                                     {
                                         int cost = int.Parse(hit.transform.name.Split('/')[1]);
                                         string[] name = hit.transform.name.Split('/')[2].Split(';');

@@ -3,6 +3,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Toys;
 using Hints;
+using InventorySystem.Configs;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
 using MapEditorReborn.API.Features.Serializable;
@@ -16,6 +17,7 @@ using UnityEngine;
 using Utf8Json.Internal.DoubleConversion;
 using Utf8Json.Resolvers.Internal;
 using static Tycoon.Core.Variables.Base;
+using static Tycoon.Core.IEnumerators.Base;
 
 namespace Tycoon.Core.Functions
 {
@@ -30,7 +32,7 @@ namespace Tycoon.Core.Functions
 
         public static Transform GetBase(int num)
         {
-            return TycoonSchematic.transform.GetChild(0).GetChild(3).GetChild(num - 1);
+            return tycoonBases[num - 1];
         }
 
         public static void ResetBase(int num)
@@ -274,11 +276,111 @@ namespace Tycoon.Core.Functions
                 float x = center.x + radius * Mathf.Cos(angle);
                 float z = center.z + radius * Mathf.Sin(angle);
                 Vector3 position = new Vector3(x, center.y, z);
-                Quaternion rotation = Quaternion.LookRotation(center - position);
+                Quaternion rotation = Quaternion.LookRotation(position - center);
                 points.Add((position, rotation));
             }
 
             return points;
+        }
+
+        public static List<Color> GenerateRainbowColors(int count)
+        {
+            List<Color> colors = new List<Color>();
+            for (int i = 0; i < count; i++)
+            {
+                float hue = (float)i / count;
+                colors.Add(Color.HSVToRGB(hue, 1.0f, 1.0f));
+            }
+            return colors;
+        }
+
+        public static void StartGame(float radius = 100, int pointCount = 35)
+        {
+            Map.IsDecontaminationEnabled = false;
+            Respawn.PauseWaves();
+            Round.IsLocked = true;
+            Round.Start();
+            Server.FriendlyFire = true;
+            Server.ExecuteCommand($"/mp load Tycoon");
+
+            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/BGMs/"))
+            {
+                string name = _audioClip.Replace(Paths.Configs + "/Tycoon/BGMs/", "").Replace(".ogg", "");
+
+                Audios["BGMs"].Add(name);
+
+                AudioClipStorage.LoadClip(_audioClip, name);
+            }
+
+            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/SEs/"))
+            {
+                string name = _audioClip.Replace(Paths.Configs + "/Tycoon/SEs/", "").Replace(".ogg", "");
+
+                Audios["SEs"].Add(name);
+
+                AudioClipStorage.LoadClip(_audioClip, name);
+            }
+
+            GlobalPlayer = AudioPlayer.CreateOrGet($"Global AudioPlayer", onIntialCreation: (p) =>
+            {
+                Speaker speaker = p.AddSpeaker("Main", isSpatial: false, maxDistance: 5000);
+            });
+
+            FirstSpawnPoint = GameObject.FindObjectsOfType<Transform>().Where(t => t.name == "[SP] First").FirstOrDefault();
+
+            List<(Vector3, Quaternion)> circlePoints = GetCirclePoints(GameObject.FindObjectsOfType<Transform>().Where(t => t.name == "Point Platform").FirstOrDefault().position, radius, pointCount);
+            List<Color> rainbowColors = GenerateRainbowColors(circlePoints.Count);
+            List<string> names = new List<string>
+            {
+                "Lower Wall",
+                "Upper Wall",
+                "Second Floor Wall",
+                "Third Floor Wall",
+                "Base Spawnpoint"
+            };
+
+            for (int i = 0; i < circlePoints.Count(); i++)
+            {
+                (Vector3, Quaternion) vector = circlePoints[i];
+                SchematicObject b_copy = ObjectSpawner.SpawnSchematic("TycoonBaseDummy", vector.Item1, vector.Item2, null, null);
+                b_copy.name = $"{i + 1}";
+
+                foreach (var t in names)
+                {
+                    Transform wall = b_copy.transform.Find(t);
+
+                    foreach (Transform primitive in wall)
+                    {
+                        if (primitive.TryGetComponent<PrimitiveObject>(out PrimitiveObject component))
+                            component.Primitive.Color = rainbowColors[i];
+                    }
+                }
+
+                tycoonBases.Add(b_copy.transform);
+            }
+
+            foreach (Transform b in tycoonBases)
+                ResetBase(int.Parse(b.name));
+
+            for (int i = 1; i < 10; i++)
+            {
+                Transform ownerDoor = GetBase(i).Find("Owner Door");
+
+                RaserDoors.Add(i, ownerDoor);
+            }
+
+            InventoryLimits.StandardCategoryLimits[ItemCategory.SpecialWeapon] = 8;
+            InventoryLimits.StandardCategoryLimits[ItemCategory.SCPItem] = 8;
+            InventoryLimits.Config.RefreshCategoryLimits();
+
+            Timing.RunCoroutine(BGM());
+            Timing.RunCoroutine(PlayerStat());
+            Timing.RunCoroutine(AutoDropper());
+            Timing.RunCoroutine(OwnerDoor());
+            Timing.RunCoroutine(ClearDecals());
+            Timing.RunCoroutine(InputCooldown());
+            Timing.RunCoroutine(ItemSpawner());
+            Timing.RunCoroutine(IsFallDown());
         }
     }
 }

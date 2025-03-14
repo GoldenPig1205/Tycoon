@@ -11,9 +11,9 @@ namespace Tycoon.Core.Variables
 {
     public static class Base
     {
+        public static bool AutoStart = false;
         public static AudioPlayer GlobalPlayer;
         public static Transform FirstSpawnPoint;
-        public static SchematicObject TycoonSchematic;
 
         public static List<Player> DropperCooldowns = new List<Player> { };
         public static List<Player> ItemCooldowns = new List<Player> { };
@@ -22,6 +22,7 @@ namespace Tycoon.Core.Variables
         public static List<Player> ChatCooldowns = new List<Player>();
         public static List<Player> IntercomPlayers = new List<Player>();
         public static List<Player> GodModePlayers = new List<Player>();
+        public static List<Transform> tycoonBases = new List<Transform> { };
         public static List<Transform> EnabledObjects = new List<Transform> { };
 
         public static Dictionary<Transform, List<PrimitiveObject>> Primitives = new Dictionary<Transform, List<PrimitiveObject>> { };

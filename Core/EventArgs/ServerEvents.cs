@@ -14,6 +14,7 @@ using static Tycoon.Core.Extensions.Base;
 using MultiBroadcast.API;
 using Exiled.API.Extensions;
 using MapEditorReborn.API.Features.Objects;
+using MapEditorReborn.API.Features;
 
 namespace Tycoon.Core.EventArgs
 {
@@ -23,82 +24,8 @@ namespace Tycoon.Core.EventArgs
         {
             yield return Timing.WaitForSeconds(1);
 
-            Map.IsDecontaminationEnabled = false;
-            Respawn.PauseWaves();
-            Round.IsLocked = true;
-            Round.Start();
-            Server.FriendlyFire = true;
-            Server.ExecuteCommand($"/mp load Tycoon");
-
-            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/BGMs/"))
-            {
-                string name = _audioClip.Replace(Paths.Configs + "/Tycoon/BGMs/", "").Replace(".ogg", "");
-
-                Audios["BGMs"].Add(name);
-
-                AudioClipStorage.LoadClip(_audioClip, name);
-            }
-
-            foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/SEs/"))
-            {
-                string name = _audioClip.Replace(Paths.Configs + "/Tycoon/SEs/", "").Replace(".ogg", "");
-
-                Audios["SEs"].Add(name);
-
-                AudioClipStorage.LoadClip(_audioClip, name);
-            }
-
-            GlobalPlayer = AudioPlayer.CreateOrGet($"Global AudioPlayer", onIntialCreation: (p) =>
-            {
-                Speaker speaker = p.AddSpeaker("Main", isSpatial: false, maxDistance: 5000);
-            });
-
-            FirstSpawnPoint = GameObject.FindObjectsOfType<Transform>().Where(t => t.name == "[SP] First").FirstOrDefault();
-
-            Transform base_ = TycoonSchematic.transform.GetChild(0).GetChild(3).GetChild(0);
-
-            List<(Vector3, Quaternion)> circlePoints = GetCirclePoints(FirstSpawnPoint.position, 100, 35);
-            for (int i = 0; i < circlePoints.Count(); i++)
-            {
-                (Vector3, Quaternion) vector = circlePoints[i];
-                Transform b_copy = UnityEngine.Object.Instantiate(base_, vector.Item1, vector.Item2);
-                b_copy.name = $"{i}";
-            }
-
-            foreach (Transform c in base_)
-                DisableObject(c);
-
-            TycoonSchematic = (SchematicObject)MapEditorReborn.API.API.SpawnedObjects.Where(x => x is SchematicObject).FirstOrDefault();
-
-            foreach (Transform b in TycoonSchematic.transform.GetChild(0).GetChild(3))
-            {
-                Dictionary<Transform, Vector3> dict = new Dictionary<Transform, Vector3> { };
-
-                foreach (Transform child in b)
-                    dict.Add(child, child.position);
-
-                ResetBase(int.Parse(b.name));
-            }
-
-            for (int i = 1; i < 10; i++)
-            {
-                Transform ownerDoor = GetBase(i).Find("Owner Door");
-
-                RaserDoors.Add(i, ownerDoor);
-            }
-
-            InventoryLimits.StandardCategoryLimits[ItemCategory.SpecialWeapon] = 8;
-            InventoryLimits.StandardCategoryLimits[ItemCategory.SCPItem] = 8;
-            InventoryLimits.Config.RefreshCategoryLimits();
-
-            Timing.RunCoroutine(BGM());
-            Timing.RunCoroutine(PlayerStat());
-            Timing.RunCoroutine(AutoDropper());
-            Timing.RunCoroutine(OwnerDoor());
-            Timing.RunCoroutine(ClearDecals());
-            Timing.RunCoroutine(InputCooldown());
-            Timing.RunCoroutine(ItemSpawner());
-            Timing.RunCoroutine(IsFallDown());
+            if (AutoStart)
+                StartGame();
         }
     }
 }

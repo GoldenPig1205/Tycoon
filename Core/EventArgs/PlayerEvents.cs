@@ -30,41 +30,50 @@ namespace Tycoon.Core.EventArgs
 {
     public static class PlayerEvents
     {
-        public static IEnumerator<float> OnVerified(VerifiedEventArgs ev)
+        public static void OnVerified(VerifiedEventArgs ev)
         {
-            ev.Player.Role.Set(RoleTypeId.Tutorial);
+            if (!AutoStart)
+                return;
 
-            if (!AudioPlayers.ContainsKey(ev.Player))
+            Timing.RunCoroutine(Verified(ev.Player));
+        }
+
+        public static IEnumerator<float> Verified(Player player)
+        {
+            player.Role.Set(RoleTypeId.Tutorial);
+            player.EnableEffect(EffectType.MovementBoost, 255, 60);
+
+            if (!AudioPlayers.ContainsKey(player))
             {
-                AudioPlayer audioPlayer = AudioPlayer.CreateOrGet($"Player - {ev.Player.UserId}", condition: (hub) =>
+                AudioPlayer audioPlayer = AudioPlayer.CreateOrGet($"Player - {player.UserId}", condition: (hub) =>
                 {
-                    return hub == ev.Player.ReferenceHub;
+                    return hub == player.ReferenceHub;
                 }
                 , onIntialCreation: (p) =>
                 {
-                    p.transform.parent = ev.Player.GameObject.transform;
+                    p.transform.parent = player.GameObject.transform;
 
                     Speaker speaker = p.AddSpeaker("Main", isSpatial: false, minDistance: 0, maxDistance: 5000);
 
-                    speaker.transform.parent = ev.Player.GameObject.transform;
+                    speaker.transform.parent = player.GameObject.transform;
                     speaker.transform.localPosition = Vector3.zero;
                 });
 
-                AudioPlayers.Add(ev.Player, audioPlayer);
+                AudioPlayers.Add(player, audioPlayer);
             }
 
-            while (!PlayerBases.ContainsKey(ev.Player))
+            while (!PlayerBases.ContainsKey(player))
             {
-                if (Physics.Raycast(ev.Player.ReferenceHub.PlayerCameraReference.position + ev.Player.ReferenceHub.PlayerCameraReference.forward * 0.2f, ev.Player.ReferenceHub.PlayerCameraReference.forward, out RaycastHit hit, 1))
+                if (Physics.Raycast(player.ReferenceHub.PlayerCameraReference.position + player.ReferenceHub.PlayerCameraReference.forward * 0.2f, player.ReferenceHub.PlayerCameraReference.forward, out RaycastHit hit, 1))
                 {
                     if (hit.transform.name == "[C] Door")
                     {
                         int num = int.Parse(hit.transform.parent.parent.name);
 
-                        PlayerBases.Add(ev.Player, num);
+                        PlayerBases.Add(player, num);
                         BaseRasers.Add(num, true);
                         BaseDollars.Add(num, 0);
-                        PlayerDollars.Add(ev.Player, 0);
+                        PlayerDollars.Add(player, 0);
 
                         DisableObject(GetBase(num).Find("Door"));
 
@@ -88,6 +97,9 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnLeft(LeftEventArgs ev)
         {
+            if (!AutoStart)
+                return;
+
             if (PlayerBases.ContainsKey(ev.Player))
             {
                 ResetBase(PlayerBases[ev.Player]);
@@ -101,6 +113,9 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnSpawned(SpawnedEventArgs ev)
         {
+            if (!AutoStart)
+                return;
+
             if (ev.Player.IsAlive)
             {
                 GodModePlayers.Add(ev.Player);
@@ -120,7 +135,7 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnHurting(HurtingEventArgs ev)
         {
-            if (ev.Attacker == null)
+            if (!AutoStart || ev.Attacker == null)
                 return;
 
             if (!ev.Attacker.IsNPC && GodModePlayers.Contains(ev.Player))
@@ -129,6 +144,9 @@ namespace Tycoon.Core.EventArgs
 
         public static IEnumerator<float> OnDied(DiedEventArgs ev)
         {
+            if (!AutoStart)
+                yield break;
+
             if (ev.Attacker != null)
             {
                 if (PlayerBases.ContainsKey(ev.Attacker) && PlayerBases.ContainsKey(ev.Player))
@@ -163,6 +181,9 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnTogglingNoClip(TogglingNoClipEventArgs ev)
         {
+            if (!AutoStart)
+                return;
+
             if (Physics.Raycast(ev.Player.ReferenceHub.PlayerCameraReference.position + ev.Player.ReferenceHub.PlayerCameraReference.forward * 0.2f, ev.Player.ReferenceHub.PlayerCameraReference.forward, out RaycastHit hit, 3))
             {
                 if (hit.transform.name.StartsWith("Button"))
@@ -310,6 +331,9 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnChangedEmotion(ChangedEmotionEventArgs ev)
         {
+            if (!AutoStart)
+                return;
+
             if (!EmotionCooldowns.Contains(ev.Player))
             {
                 EmotionCooldowns.Add(ev.Player);
@@ -347,6 +371,9 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnPickingUpItem(PickingUpItemEventArgs ev)
         {
+            if (!AutoStart)
+                return;
+
             if (ev.Pickup.Type == ItemType.Coin)
             {
                 ev.Pickup.Destroy();
