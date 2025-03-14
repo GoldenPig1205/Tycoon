@@ -54,6 +54,20 @@ namespace Tycoon.Core.EventArgs
             });
 
             FirstSpawnPoint = GameObject.FindObjectsOfType<Transform>().Where(t => t.name == "[SP] First").FirstOrDefault();
+
+            Transform base_ = TycoonSchematic.transform.GetChild(0).GetChild(3).GetChild(0);
+
+            List<(Vector3, Quaternion)> circlePoints = GetCirclePoints(FirstSpawnPoint.position, 100, 35);
+            for (int i = 0; i < circlePoints.Count(); i++)
+            {
+                (Vector3, Quaternion) vector = circlePoints[i];
+                Transform b_copy = UnityEngine.Object.Instantiate(base_, vector.Item1, vector.Item2);
+                b_copy.name = $"{i}";
+            }
+
+            foreach (Transform c in base_)
+                DisableObject(c);
+
             TycoonSchematic = (SchematicObject)MapEditorReborn.API.API.SpawnedObjects.Where(x => x is SchematicObject).FirstOrDefault();
 
             foreach (Transform b in TycoonSchematic.transform.GetChild(0).GetChild(3))

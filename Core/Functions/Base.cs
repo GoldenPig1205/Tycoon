@@ -262,5 +262,23 @@ namespace Tycoon.Core.Functions
             else
                 return "";
         }
+
+        public static List<(Vector3 position, Quaternion rotation)> GetCirclePoints(Vector3 center, float radius, int pointCount)
+        {
+            List<(Vector3 position, Quaternion rotation)> points = new List<(Vector3 position, Quaternion rotation)>();
+            float angleStep = 2 * Mathf.PI / pointCount;
+
+            for (int i = 0; i < pointCount; i++)
+            {
+                float angle = i * angleStep;
+                float x = center.x + radius * Mathf.Cos(angle);
+                float z = center.z + radius * Mathf.Sin(angle);
+                Vector3 position = new Vector3(x, center.y, z);
+                Quaternion rotation = Quaternion.LookRotation(center - position);
+                points.Add((position, rotation));
+            }
+
+            return points;
+        }
     }
 }
