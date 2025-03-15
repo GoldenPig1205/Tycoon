@@ -18,6 +18,7 @@ using Utf8Json.Internal.DoubleConversion;
 using Utf8Json.Resolvers.Internal;
 using static Tycoon.Core.Variables.Base;
 using static Tycoon.Core.IEnumerators.Base;
+using Mirror;
 
 namespace Tycoon.Core.Functions
 {
@@ -301,7 +302,7 @@ namespace Tycoon.Core.Functions
             Round.IsLocked = true;
             Round.Start();
             Server.FriendlyFire = true;
-            Server.ExecuteCommand($"/mp load Tycoon");
+            ObjectSpawner.SpawnSchematic("Tycoon", new Vector3(0, 1050, 0), null, null, null);
 
             foreach (var _audioClip in System.IO.Directory.GetFiles(Paths.Configs + "/Tycoon/BGMs/"))
             {
@@ -338,6 +339,8 @@ namespace Tycoon.Core.Functions
                 "Third Floor Wall",
                 "Base Spawnpoint"
             };
+
+            SchematicObject carpet = ObjectSpawner.SpawnSchematic("Carpet", GameObject.FindObjectsOfType<Transform>().Where(t => t.name == "Point Platform").FirstOrDefault().position, null, new Vector3(0.2f * circlePoints.Count(), 1, 0.2f * circlePoints.Count()), null);
 
             for (int i = 0; i < circlePoints.Count(); i++)
             {

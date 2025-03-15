@@ -263,6 +263,12 @@ namespace Tycoon.Core.IEnumerators
                     Server.ExecuteCommand($"/cleanup {s}");
                 }
 
+                foreach (var obj in MapEditorReborn.API.API.SpawnedObjects)
+                {
+                    if (!obj.IsSchematicBlock)
+                        obj.Destroy();
+                }
+
                 yield return Timing.WaitForSeconds(300);
             }
         }

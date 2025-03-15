@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Exiled.API.Features;
 using Tycoon.Core.Configs;
+using static Tycoon.Core.EventArgs.MEREvents;
 using static Tycoon.Core.EventArgs.ServerEvents;
 using static Tycoon.Core.EventArgs.MapEvents;
 using static Tycoon.Core.EventArgs.PlayerEvents;
@@ -28,6 +29,8 @@ namespace Tycoon
 
             AutoStart = Config.AutoStart;
 
+            MapEditorReborn.Events.Handlers.MapEditorObject.DeletingObject += OnDeletingObject;
+
             Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
 
             Exiled.Events.Handlers.Player.Verified += OnVerified;
@@ -42,6 +45,8 @@ namespace Tycoon
 
         public override void OnDisabled()
         {
+            MapEditorReborn.Events.Handlers.MapEditorObject.DeletingObject -= OnDeletingObject;
+
             Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
 
             Exiled.Events.Handlers.Player.Verified -= OnVerified;

@@ -41,7 +41,6 @@ namespace Tycoon.Core.EventArgs
         public static IEnumerator<float> Verified(Player player)
         {
             player.Role.Set(RoleTypeId.Tutorial);
-            player.EnableEffect(EffectType.MovementBoost, 255, 60);
 
             if (!AudioPlayers.ContainsKey(player))
             {
