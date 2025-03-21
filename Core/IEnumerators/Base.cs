@@ -342,5 +342,19 @@ namespace Tycoon.Core.IEnumerators
                 yield return Timing.WaitForSeconds(0.1f);
             }
         }
+
+        public static IEnumerator<float> PlayerBadge()
+        {
+            while (true)
+            {
+                foreach (var player in Player.List.Where(x => PlayerInfoDict.ContainsKey(x)))
+                {
+                    player.RankName = $"{PlayerInfoDict[player].Kill}/{PlayerInfoDict[player].Death}/{PlayerInfoDict[player].Assist} (💲{PlayerDollars[player]})";
+                    player.RankColor = "white";
+                }
+
+                yield return Timing.WaitForSeconds(1);
+            }
+        }
     }
 }

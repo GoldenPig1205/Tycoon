@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Tycoon.Core.Classes;
+using PlayerRoles.SpawnData;
 
 namespace Tycoon.Core.Variables
 {
@@ -38,5 +40,7 @@ namespace Tycoon.Core.Variables
         public static Dictionary<int, bool> BaseRasers = new Dictionary<int, bool> { }; // 베이스 ID, 여부
         public static Dictionary<int, Transform> RaserDoors = new Dictionary<int, Transform>();
         public static Dictionary<Player, float> OnGround = new Dictionary<Player, float>();
+        public static Dictionary<Player, PlayerInfo> PlayerInfoDict = new Dictionary<Player, PlayerInfo> { };
+        public static Dictionary<Player, List<Player>> PlayerKillAssistDict  = new Dictionary<Player, List<Player>> { };
     }
 }

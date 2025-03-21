@@ -127,6 +127,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Classes\PlayerInfo.cs" />
     <Compile Include="Core\Classes\RemoteCommandSender.cs" />
     <Compile Include="Core\Commands\ClientCommands\basicfeatures\Chat.cs" />
     <Compile Include="Core\Commands\ClientCommands\basicfeatures\Emotion.cs" />

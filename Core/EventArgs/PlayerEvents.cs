@@ -40,6 +40,17 @@ namespace Tycoon.Core.EventArgs
 
         public static IEnumerator<float> Verified(Player player)
         {
+            if (!PlayerInfoDict.ContainsKey(player))
+            {
+                PlayerInfoDict.Add(player, new PlayerInfo
+                {
+                    Kill = 0,
+                    Death = 0,
+                    Assist = 0
+                });
+                PlayerKillAssistDict.Add(player, new List<Player>());
+            }
+
             player.Role.Set(RoleTypeId.Tutorial);
 
             if (!AudioPlayers.ContainsKey(player))
@@ -139,6 +150,12 @@ namespace Tycoon.Core.EventArgs
 
             if (!ev.Attacker.IsNPC && GodModePlayers.Contains(ev.Player))
                 ev.IsAllowed = false;
+
+            else
+            {
+                if (!PlayerKillAssistDict[ev.Player].Contains(ev.Attacker))
+                    PlayerKillAssistDict[ev.Player].Add(ev.Attacker);
+            }
         }
 
         public static IEnumerator<float> OnDied(DiedEventArgs ev)
@@ -148,6 +165,14 @@ namespace Tycoon.Core.EventArgs
 
             if (ev.Attacker != null)
             {
+                PlayerInfoDict[ev.Attacker].Kill++;
+                PlayerInfoDict[ev.Player].Death++;
+                foreach (var player in PlayerKillAssistDict[ev.Player])
+                {
+                    PlayerInfoDict[player].Assist++;
+                }
+                PlayerKillAssistDict[ev.Player].Clear();
+
                 if (PlayerBases.ContainsKey(ev.Attacker) && PlayerBases.ContainsKey(ev.Player))
                 {
                     AudioPlayers[ev.Attacker].AddClip("Coin");
@@ -326,6 +351,16 @@ namespace Tycoon.Core.EventArgs
                     }
                 }
             }
+        }
+
+        public static void OnChangingGroup(ChangingGroupEventArgs ev)
+        {
+            ulong permission = ev.Player.Group.Permissions;
+
+            Timing.CallDelayed(1, () =>
+            {
+                ev.Player.Group.Permissions = permission;
+            });
         }
 
         public static void OnChangedEmotion(ChangedEmotionEventArgs ev)

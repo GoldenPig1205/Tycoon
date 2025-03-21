@@ -39,6 +39,7 @@ namespace Tycoon
             Exiled.Events.Handlers.Player.Hurting += OnHurting;
             Exiled.Events.Handlers.Player.Died += OnDied;
             Exiled.Events.Handlers.Player.TogglingNoClip += OnTogglingNoClip;
+            Exiled.Events.Handlers.Player.ChangingGroup += OnChangingGroup;
             Exiled.Events.Handlers.Player.ChangedEmotion += OnChangedEmotion;
             Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
         }
@@ -55,6 +56,7 @@ namespace Tycoon
             Exiled.Events.Handlers.Player.Hurting -= OnHurting;
             Exiled.Events.Handlers.Player.Died -= OnDied;
             Exiled.Events.Handlers.Player.TogglingNoClip -= OnTogglingNoClip;
+            Exiled.Events.Handlers.Player.ChangingGroup -= OnChangingGroup;
             Exiled.Events.Handlers.Player.ChangedEmotion -= OnChangedEmotion;
             Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
 

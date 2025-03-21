@@ -384,6 +384,7 @@ namespace Tycoon.Core.Functions
             Timing.RunCoroutine(InputCooldown());
             Timing.RunCoroutine(ItemSpawner());
             Timing.RunCoroutine(IsFallDown());
+            Timing.RunCoroutine(PlayerBadge());
         }
     }
 }
