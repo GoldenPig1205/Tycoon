@@ -51,6 +51,9 @@ namespace Tycoon.Core.EventArgs
                 PlayerKillAssistDict.Add(player, new List<Player>());
             }
 
+            player.Group = null;
+            player.RankName = null;
+            player.BadgeHidden = false;
             player.Role.Set(RoleTypeId.Tutorial);
 
             if (!AudioPlayers.ContainsKey(player))
@@ -355,6 +358,9 @@ namespace Tycoon.Core.EventArgs
 
         public static void OnChangingGroup(ChangingGroupEventArgs ev)
         {
+            if (!AutoStart)
+                return;
+
             ulong permission = ev.Player.Group.Permissions;
 
             Timing.CallDelayed(1, () =>

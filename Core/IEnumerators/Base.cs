@@ -349,7 +349,7 @@ namespace Tycoon.Core.IEnumerators
             {
                 foreach (var player in Player.List.Where(x => PlayerInfoDict.ContainsKey(x)))
                 {
-                    player.RankName = $"{PlayerInfoDict[player].Kill}/{PlayerInfoDict[player].Death}/{PlayerInfoDict[player].Assist} (💲{PlayerDollars[player]})";
+                    player.RankName = $"{PlayerInfoDict[player].Kill}/{PlayerInfoDict[player].Death}/{PlayerInfoDict[player].Assist} (💲{(PlayerDollars.ContainsKey(player) ? PlayerDollars[player] : "0")})";
                     player.RankColor = "white";
                 }
 
